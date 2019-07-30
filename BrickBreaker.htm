@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Bungee&display=swap" rel="stylesheet">
+        <title>Brick Breaker</title>
+        <style type='text/css'>
+    
+            *{
+                padding: 0;
+                margin: 0;
+                box-sizing: border-box;
+                font-size: 14;
+            }
+    
+            body {
+                width: 100vw;
+                height: 100vh;
+    
+                display: flex;
+                flex-direction: column;
+            }
+    
+            canvas#ballpen{
+              width: 100vw;
+    
+               flex-basis: 95%;
+               /* background-image: url(C:\Users\CTYSession1\Desktop\CTY19_MaxB\backgroundPong.png) */
+            }
+    
+            div#header{
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                background-color: rgb(77, 156, 74);
+                    
+                flex-basis: 1%;
+            }
+    
+            div#header > div {     
+                font-family: 'Bungee', cursive;         
+                color: rgb(255, 255, 255);
+                font-size: 4rem;   
+                flex-grow: 1;            
+            }
+    
+            </style>
+    </head>
+    <body>
+        <div id="header">
+            <div>
+                &nbsp;
+            </div>
+            <div id="life">
+                5
+            </div>
+            <div id="title">
+                Brick Breaker
+            </div>
+        </div>
+        <canvas id='ballpen'></canvas>
+        <script type="text/javascript">
+
+            let canvas = document.getElementById('ballpen');
+
+            let paddle = {
+                    height : 20,
+                    width : 200,
+                    x: 0,
+                    y: 0,
+                    changeX: 7,
+                }
+            
+            let ball = {
+                radius : 17,
+                x : 0, //center X
+                y : 0, //center y
+                velX : 8,
+                velY : 8,
+
+                move: function(){
+                    this.x += this.velX;
+                    this.y += this.velY;
+                }
+            }
+
+            class Brick{
+                constructor(x, y){
+                    this.height = 20
+                    this.width = 75
+                    this.x = x
+                    this.y = y
+                   
+                }
+
+                draw(can){
+                    let pen = can.getContext('2d');
+                    pen.fillRect(this.x, this.y, this.width, this.height);
+                }
+            }
+
+            const NUM_COLS = 15;
+            const NUM_ROWS = 4;
+            // const SPACE_Y = space_between/2
+
+            let bricks = []
+
+            let lives = 5
+            let life = document.getElementById('life')
+
+            function init() {
+                
+                canvas.width = canvas.clientWidth;//canContainer
+                canvas.height = canvas.clientHeight;
+                
+                ball.x = canvas.width/2;
+                ball.y = canvas.height/2;
+
+                paddle.x = canvas.width/2 - paddle.width/2
+                paddle.y = canvas.height - 70
+
+                document.addEventListener('keydown', movePaddles)
+                document.addEventListener('keyup', stopPaddles)
+
+
+                
+                let phonybrick = new Brick(0,0);
+                let space_between = (canvas.width - NUM_COLS*phonybrick.width)/ NUM_COLS
+                let x = space_between/2;
+                let y = space_between/2
+
+                for( let j = 0; j < NUM_ROWS; j++ ) {
+                    for( let i = 0; i < NUM_COLS; i++ ){
+                        let brick = new Brick( x,y);
+                        bricks.push(brick)
+                        x += space_between + brick.width;
+                    }
+
+                    x = space_between/2
+                    y += space_between/2 + phonybrick.height;
+                }
+
+                requestAnimationFrame(nextFrame);
+            }
+
+            let moving = {
+                moveLeft: false,
+                moveRight: false
+            }
+
+            function movePaddles(event){
+                if ((event.keyCode == 37) && (paddle.y > 0 )){
+                    // paddle.y -= paddle.changeY
+                    moving.moveLeft = true
+                }
+                if (event.keyCode == 39 && (paddle.y + paddle.height < canvas.height)){
+                    // paddle.y += paddle.changeY
+                    moving.moveRight = true
+                }
+            }
+            function stopPaddles(event){
+                if (event.keyCode == 37){
+                    // paddle.y -= paddle.changeY
+                    moving.moveLeft = false
+                }
+                if (event.keyCode == 39){
+                    // paddle.y += paddle.changeY
+                    moving.moveRight = false
+                }
+            }
+
+            function sideCollison(){
+                if( ball.y + ball.radius > canvas.height ){
+                    ball.y = canvas.height - ball.radius;
+                    ball.velY *= -1;
+                    return "loseLife";
+                }
+                if( ball.x + ball.radius > canvas.width){
+                    ball.x =canvas.width - ball.radius;
+                    ball.velX *= -1;
+                    return 'a'
+                }
+                if( ball.y < 0){
+                    ball.y += ball.radius;
+                    ball.velY *= -1;
+                    return "b"
+                    
+                }
+                if( ball.x < 0){
+                    ball.x += ball.radius
+                    ball.velX *= -1;
+                    return 'c'
+                }
+                return ""
+            }
+
+            function doesCollide(r1, r2){//(r1.x + r1.radius < r2.x) || (r1.y + r1.radius < r2.y) || (r1.x > r2.x + r2.width) || (r1.y > r2.y + r2.length)
+                if (!((r1.y + r1.radius < r2.y) || (r1.x + r1.radius < r2.x) || (r1.x > r2.x + r2.width) || (r1.y > r2.y + r2.height))){
+                    ball.velY *= -1
+                    return true
+                }else{
+                    return false
+                }
+            }
+
+            //draws the next frame
+            function nextFrame(time) {
+                let pen = canvas.getContext('2d');
+                pen.clearRect(0, 0, canvas.width, canvas.height);
+
+
+                if((moving.moveRight == true) && (paddle.x + paddle.width < canvas.width)){
+                    paddle.x += paddle.changeX
+                }if((moving.moveLeft == true) && (paddle.x > 0)){
+                    paddle.x -= paddle.changeX
+                }
+                ball.move()
+
+                doesCollide(ball, paddle)
+                for(let i = 0; i< bricks.length; i++){
+                    let brick = bricks[i]  
+                    if(doesCollide(ball, brick)){
+                        bricks.splice(i, 1)
+                    }
+                }
+
+                let score = sideCollison() 
+                if(score.length == 8){
+                    lives -= 1
+                    ball.x = canvas.width/2 + 50;
+                    ball.y = canvas.height/2;
+                    ball.velY *= -1
+                    life.innerHTML = lives
+                }
+
+
+                pen.beginPath();
+                pen.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
+                pen.fill();
+
+                pen.fillRect(paddle.x, paddle.y, paddle.width, paddle.height)
+
+                for( let brick of bricks){
+                    brick.draw(canvas)
+                }
+                
+                if(!(lives == 0)){
+                    requestAnimationFrame(nextFrame);
+                }
+
+                
+            }
+
+        window.onload = init
+        </script>
+    </body>
+</html>
