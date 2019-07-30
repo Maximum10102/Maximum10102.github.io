@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="icon" href="../FinalProject/icon.ico" />
+    <title>SURVIVAL</title>
+    <style type='text/css'>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-size: 14;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        canvas#ballpen {
+            width: 100vw;
+
+            flex-basis: 95%;
+            /* background-image: url(C:\Users\CTYSession1\Desktop\CTY19_MaxB\backgroundPong.png) */
+        }
+
+        div#header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #45246B;
+
+            flex-basis: 5%;
+        }
+
+        div#header>div {
+            display: flex;
+            padding: .5em;
+            font-family: 'Press Start 2P', cursive;
+            color: rgb(255, 255, 255);
+        }
+
+        div#wave {
+
+            font-size: 1.25rem;
+        }
+
+        div#score {
+            font-size: 1.25rem;
+        }
+
+        div#title {
+            font-size: 2.25rem;
+        }
+    </style>
+</head>
+<!--New in verison 1.3:
+    - Jumping has been implimented
+    - Raid has been used on some minor bugs
+    - Highscore now works
+    - Removed Herobrine
+    - Bought Epic Games and deleted Fortnite
+    - Nerfed Bastion
+    - Went back in time and made EA never happen
+    - Installed Terraria 1.3 on mobile 
+-->
+
+<body>
+    <div style="display:none;">
+        <img id="zL" src="../FinalProject/zombieRight.png" width="40" height="25">
+        <img id="zR" src="../FinalProject/zombieLeft.png" width="40" height="25">
+        <img id="hL" src="../FinalProject/HeroL.png" width="40" height="25">
+        <img id="hR" src="../FinalProject/HeroR.png" width="40" height="25">
+    </div>
+
+    <div id="header">
+        <div id="score">
+            Score: 0
+        </div>
+        <div id="title">
+            SURVIVAL
+        </div>
+        <div id="wave">
+            Wave: 1
+        </div>
+    </div>
+    <canvas id='ballpen'></canvas>
+    <script type="text/javascript">
+        let canvas = document.getElementById('ballpen');
+        let bullets = []
+        let gameover = false
+        let score = 0
+        if(localStorage.getItem("highscore") == null){
+            localStorage.setItem("highscore", 0)
+        }//Highscore
+        let highscore = localStorage.getItem("highscore");
+        let Score = document.getElementById("score")
+        let waves = document.getElementById("wave")
+        class Bullet {
+            constructor(x, y, face) {
+                this.height = 8
+                this.width = 27.2
+                this.x = x
+                this.y = player.y + 35
+                this.speed = 27
+                this.facing = face
+            }
+
+            draw(can) {
+                let pen = can.getContext('2d');
+                pen.fillStyle = "#ffff1a"
+                pen.fillRect(this.x, this.y, this.width, this.height);
+            }           
+        }
+        let player = {
+            height: 81.92,
+            width: 50,
+            x: 0,
+            y: 0,
+            changeX: 5.5,
+            VelY: 0,
+            health: 100,
+            facing: 'left',
+
+            shoot: function () {
+                let bullet = new Bullet(this.x + 20, this.y, this.facing)
+                bullets.push(bullet)
+                shooting = false
+            }
+        }
+
+        const GRAVITY = 2;
+
+        let moving = {
+            moveLeft: false,
+            moveRight: false,
+        }
+
+        let HealthBar = {
+            width: player.health,
+            height: 15,
+            x: 0,
+            y: 0,
+
+        }
+
+        let zombies = []
+        let zombiesL = []
+        let zombiesR = []
+
+        let shooting = false
+
+        var Lx = 0
+        var yy = 0
+        var Rx = 0
+
+        let zL = document.getElementById('zL')
+        let zR = document.getElementById('zR')
+        let hL = document.getElementById('hL')
+        let hR = document.getElementById('hR')
+
+        class Zombie {
+            constructor(x, y, face) {
+                this.height = 81.92,
+                    this.width = 64,
+                    this.x = x
+                this.y = y
+                this.speed = 5
+                this.amount = 5
+                this.facing = face
+                this.targetx = player.x
+
+            }
+
+            draw(can) {
+                let pen = can.getContext('2d');
+                pen.fillStyle = '#336600'
+                if (this.facing == 'left') {
+                    pen.drawImage(zL, this.x, this.y, this.width, this.height)
+                }
+                if (this.facing == 'right') {
+                    pen.drawImage(zR, this.x, this.y, this.width, this.height)
+                }
+                //pen.fillRect(this.x, player.y, this.width, this.height);
+            }
+
+            moveR() {
+                if (this.targetx < this.x) {
+                    this.x -= this.speed
+                    this.facing = 'right'
+                }
+                if (this.targetx > this.x) {
+                    this.x += this.speed
+                    this.facing = 'left'
+                }
+                this.targetx = player.x
+            }
+            moveL() {
+                if (this.targetx < this.x) {
+                    this.x -= this.speed
+                    this.facing = 'right'
+                }
+                if (this.targetx > this.x) {
+                    this.x += this.speed
+                    this.facing = 'left'
+                }
+                this.targetx = player.x
+            }
+        }
+
+        function Reset(event) {
+            if (gameover == true) {
+                wave = 1
+                score = 0
+                player.health = 100
+                zombies = []
+                zombiesL = []
+                zombiesR = []
+
+                player.x = canvas.width / 2 - player.width / 2
+                player.y = canvas.height - 130
+
+                title.innerHTML = "SURVIVAL"
+
+                Lx = -5
+                yy = player.y
+                Rx = canvas.width + 27
+
+                console.log(player.health)
+
+                waveChange()
+                gameover = false
+                requestAnimationFrame(nextFrame)
+            }
+        }
+
+
+        function init() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+
+            document.addEventListener('keydown', keyDown)
+            document.addEventListener('keyup', keyUp)
+            title.addEventListener('click', Reset)
+            canvas.addEventListener('click', Shoot)
+            gameover = true
+            Reset()
+        }
+
+        var Rzombie = new Zombie(Rx, player.y, 'right')
+        var Lzombie = new Zombie(Lx, player.y, 'left')
+
+        function DoesCollide(rect1, rect2) {
+            if (rect1.x > rect2.x + rect2.width) {
+                return false
+            }
+            if (rect1.x + rect1.width < rect2.x) {
+                return false
+            }
+            if (rect1.y + rect1.height < rect2.y) {
+                return false
+            }
+            if (rect1.y > rect2.y + rect2.height) {
+                return false
+            }
+            return true
+        }
+
+        let wave = 0
+        let amount = 0
+        let LAmount = 0
+        let RAmount = 0
+
+        function waveChange() {
+            wave += 1
+            amount = wave * 3
+            LAmount = amount / 2
+            RAmount = amount / 2
+            for (let i = 0; i < LAmount; i++) {
+                let zombie = new Zombie(Lx, player.y, 'left')
+                zombiesL.push(zombie)
+                zombies.push(zombie)
+                Lx -= 45
+            }
+            for (let j = 0; j < RAmount; j++) {
+                let zombie = new Zombie(Rx, player.y, 'right')
+                zombiesR.push(zombie)
+                zombies.push(zombie)
+                Rx += 45
+            }
+        }
+
+        function stopText() {
+            let pen = canvas.getContext('2d');
+            pen.fillStyle = '#000000'
+        }
+
+        function Shoot(event) {
+            player.shoot()
+        }
+
+
+        function keyDown(event) {
+            if ((event.keyCode == 65) && (player.y > 0)) {
+                player.facing = 'left'
+                moving.moveLeft = true
+            }
+            if ((event.keyCode == 68) && (player.y + player.height < canvas.height)) {
+                player.facing = 'right'
+                moving.moveRight = true
+            }
+            if (event.keyCode == 32) {
+                if (player.y == canvas.height - 130) {
+                    player.VelY += -30;
+                    player.changeX += 3;
+
+                }
+            }
+        }
+
+        function keyUp(event) {
+            if (event.keyCode == 65) {
+                // paddle.y -= paddle.changeY
+                moving.moveLeft = false
+            }
+            if (event.keyCode == 68) {
+                // paddle.y += paddle.changeY
+                moving.moveRight = false
+            }
+        }
+
+        let background = new Image()
+        background.src = "../FinalProject/background.jpg"
+
+        let floor = new Image()
+        floor.src = "../FinalProject/floor.jpg"
+
+        //draws the next frame
+        function nextFrame(time) {
+            let survival = document.getElementById("title")
+            let pen = canvas.getContext('2d');
+            pen.fillStyle = '#000000'
+            pen.clearRect(0, 0, canvas.width, canvas.height);
+            pen.drawImage(background, 0, -385)
+            pen.drawImage(floor, 0, 512, canvas.width, floor.height)
+
+            //MOVE
+            if ((moving.moveRight == true) && (player.x + player.width < canvas.width)) {
+                player.x += player.changeX
+            }
+            if ((moving.moveLeft == true) && (player.x > 0)) {
+                player.x -= player.changeX
+            }
+
+            // move up/down
+            player.y += player.VelY;
+            // gravity
+            player.VelY += GRAVITY
+
+            // HACK: ground is 130px
+            if (player.y > canvas.height - 130) {
+                player.changeX = 5.5
+                player.VelY = 0
+                player.y = canvas.height - 130
+                // player.changeX -= 2
+            }
+
+            for (let z of zombiesL) {
+                z.moveL()
+            }
+            for (let m of zombiesR) {
+                m.moveR()
+            }
+
+            for (let i = 0; i < bullets.length; i++) {
+                if (bullets[i].facing == 'right') {
+                    bullets[i].x += bullets[i].speed
+                }
+                if (bullets[i].facing == 'left') {
+                    bullets[i].x -= bullets[i].speed
+                }
+                pen.fillStyle = "#4260f5"
+                bullets[i].draw(canvas)
+            }
+            //COLLISION
+            newZombies = []
+            for (let j = 0; j < zombies.length; j++) {
+                if (DoesCollide(player, zombies[j])) {
+                    zombies[j].speed = 0
+                    player.health -= 0.75
+                } else {
+                    zombies[j].speed = 5
+                }
+            }
+            for (let b = 0; b < zombies.length; b++) {
+                for (let m = 0; m < bullets.length; m++) {
+                    if ((b < zombies.length) && (DoesCollide(bullets[m], zombies[b]))) {
+                        zombies.splice(b, 1)
+                        bullets.splice(m, 1)
+                        score += 3
+                        Score.innerHTML = "Score: " + score
+                    }
+                }
+            }
+            for (let o = 0; o < bullets.length; o++) {
+                if ((bullets[o].x < 0) || (bullets[o].x + bullets[o].width > canvas.width)) {
+                    bullets.splice(o, 1)
+                }
+            }
+
+            //DRAW
+            for (let zombie of zombies) {
+                zombie.draw(canvas)
+            }
+
+            HealthBar.x = player.x + player.width / 2 - HealthBar.width / 2
+            HealthBar.y = player.y - 20
+            HealthBar.width = player.health * 2
+            if (player.facing == 'left') {
+                pen.drawImage(hL, player.x, player.y, player.width, player.height)
+            }
+            if (player.facing == 'right') {
+                pen.drawImage(hR, player.x, player.y, player.width, player.height)
+            }
+            // pen.fillRect(player.x, player.y, player.width, player.height)
+
+            //Health  
+            if (player.health > 75) {
+                pen.fillStyle = "#74ed7e"
+            }
+            if (player.health >= 50 && player.health < 75) {
+                pen.fillStyle = "#d7f542"
+            }
+            if (player.health >= 25 && player.health < 50) {
+                pen.fillStyle = "#f5aa42"
+            }
+            if (player.health <= 25) {
+                pen.fillStyle = "#f72525"
+            }
+            if (player.health > 0) {
+                pen.fillRect(HealthBar.x, HealthBar.y, HealthBar.width, HealthBar.height)
+            }
+
+            //Waves & score
+            if (zombies.length <= 1) {
+                waves.innerHTML = 'Wave: ' + wave
+                waveChange()
+            }
+            if (player.health <= 0) {
+                gameover = true
+                title.innerHTML = "You Lose! Click to restart."
+                Score.innerHTML = "Highscore: " + highscore
+                if (score > highscore) {
+                    title.innerHTML = "New Highscore! Refresh to set it!"
+                    localStorage.setItem("highscore", score);
+                }
+            }
+            console.log(gameover)
+            if (gameover == false) {
+                requestAnimationFrame(nextFrame)
+            }
+        }
+        window.onload = init
+    </script>
+</body>
+
+</html>
