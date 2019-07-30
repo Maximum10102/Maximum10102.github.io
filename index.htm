@@ -1,4 +1,5 @@
 <html>
+
 <head>
 
 
@@ -38,18 +39,18 @@
             display: flex;
         }
 
-        div#links > div ul {
+        div#links>div ul {
             list-style: none;
             color: azure;
             text-decoration: none;
         }
 
-        div#links > div a:visited {
+        div#links>div a:visited {
             list-style: none;
             color: azure;
         }
 
-        div#linkhead{
+        div#linkhead {
             text-decoration: azure;
             font-weight: bolder;
             background-color: #286A8A;
@@ -61,7 +62,7 @@
             padding: 0%;
             margin: 0%;
         }
-                      
+
         div.links {
             flex-direction: column;
             width: 26%;
@@ -69,38 +70,38 @@
             padding: .2em;
             height: 40%;
             text-decoration-color: azure;
-            
+
         }
 
-        li a{
+        li a {
             display: block;
             padding: .5em;
             text-decoration: none;
-            color:azure;
+            color: azure;
         }
 
-        .tooltiptext{
+        .tooltiptext {
             visibility: hidden;
             width: 120px;
             color: azure;
             text-align: center;
             border-radius: 6px;
             padding: 5px 0;
-  
+
             /* Position the tooltip */
             top: -5px;
             right: 105%;
         }
 
-        .tooltip:hover .tooltiptext{
+        .tooltip:hover .tooltiptext {
             visibility: visible;
         }
 
-        li a:hover  {
+        li a:hover {
             background-color: rgb(75, 132, 165);
             color: azure;
             text-decoration: none;
-            
+
             visibility: visible;
         }
 
@@ -121,7 +122,7 @@
             flex-direction: column;
         }
 
-        div#welcome{
+        div#welcome {
             width: fit-content;
             display: flex;
             flex-direction: column;
@@ -134,7 +135,7 @@
 
         }
 
-        div#content{
+        div#content {
             height: fit-content;
             display: flex;
             flex-direction: column;
@@ -143,14 +144,9 @@
         }
 
         img {
-            width: 43em;
-            height: 30em;
+            max-width: 100%;
+  height: auto;
         }
-
-
-
-
-
     </style>
 </head>
 
@@ -170,9 +166,18 @@
                     <div id="linkhead">
                         <li>Project Links:</li>
                     </div>
-                    <div><li class="links tooltip"><a href="/Tic-Tac-Toe.htm" target="_blank">Tic-Tac-Toe<span class="tooltiptext">: Classic Tic-Tac-Toe</span></a></li></div>
-                    <div><li class="links tooltip"><a href="/pong.htm" target="_blank">Pong<span class="tooltiptext">: The original video game</span></a></li></div>
-                    <div><li class="links tooltip"><a href="/BrickBreaker.htm" target="_blank">Brick Breaker<span class="tooltiptext">: Like pong on it's side</span></a></li></div>
+                    <div>
+                        <li class="links tooltip"><a href="/Tic-Tac-Toe.htm" target="_blank">Tic-Tac-Toe<span
+                                    class="tooltiptext">: Classic Tic-Tac-Toe</span></a></li>
+                    </div>
+                    <div>
+                        <li class="links tooltip"><a href="/pong.htm" target="_blank">Pong<span class="tooltiptext">:
+                                    The original video game</span></a></li>
+                    </div>
+                    <div>
+                        <li class="links tooltip"><a href="/BrickBreaker.htm" target="_blank">Brick Breaker<span
+                                    class="tooltiptext">: Like pong on it's side</span></a></li>
+                    </div>
                     <!-- <div><li class="links tooltip"><a href="/FinalProject/Survival.htm" target="_blank">Survival<span class="tooltiptext">: A zombie shooter game</span></a></li></div> -->
                 </ul>
             </div>
@@ -185,10 +190,11 @@
                         <li class="links"><a href="https://www.google.com/" target="_blank">Google</a></li>
                     </div>
                     <div>
-                         <li class="links"><a href="https://www.youtube.com/" target="_blank">Youtube</a></li>
+                        <li class="links"><a href="https://www.youtube.com/" target="_blank">Youtube</a></li>
                     </div>
                     <div>
-                          <li class="link"><a href="https://www.mlb.com/nationals" target="_blank">Washington Nationals</a></li>
+                        <li class="link"><a href="https://www.mlb.com/nationals" target="_blank">Washington
+                                Nationals</a></li>
                     </div>
                 </ul>
             </div>
@@ -203,4 +209,5 @@
         </div>
     </div>
 </body>
+
 </html>
